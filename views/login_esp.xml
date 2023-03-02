@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="login_esp">
+        <t t-call="web.login_layout">
+            <div class="container" >
+                <div class="row">
+                    <div class="col-lg-12 text-center">
+                        <h4 class="font-weight-bold text-center" > <span>Вход на портал</span></h4>
+                        <ul class="nav nav-tabs nav-pills with-arrow lined flex-column flex-sm-row">
+                            <li class="nav-item flex-sm-fill col-sm-12 col-md-4">
+                                <a type="button" class="nav-link  rounded-0" id="selectSignType" href="/web/login"><span>Login/Password</span></a>
+                            </li>
+                            <li class="nav-item flex-sm-fill col-sm-12 col-md-4">
+                                <a type="button" class="nav-link rounded-0" href="/web/login_esp"><span>EDS</span></a>
+                            </li>
+                            <li class="nav-item flex-sm-fill col-sm-12 col-md-4">
+                                <a type="button" class="nav-link rounded-0" href="/web/login_digital_id"><span>Digital ID</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+             <form id="oe_signup_form" method="post" role="form" enctype="application/x-www-form-urlencoded" autocomplete="off" style="width: fit-content; margin: auto;">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                 <div id="signPnlSignedXMLS" style="visibility: hidden;">
+                    <input type="hidden" id="certificate" name="certificate"/>
+                </div>
+                <div style="visibility: hidden;">
+                    <input id="usernameEds" type="hidden" name="username"/>
+                </div>
+                <div style="visibility: hidden;">
+                    <input id="eds_lvl" type="hidden" name="lvl" value="7"/>
+                </div>
+                <div style="visibility: hidden;">
+                    <input id="url" type="hidden" name="url" value=""/>
+                </div>
+
+                <div t-attf-class="clearfix oe_login_buttons text-center mb-1 {{'pt-2' if form_small else 'pt-3'}}">
+                    <input type="hidden" name="storagePath" id="storagePath" value=""/>
+                    <input type="hidden" name="storageAlias" id="storageAlias" value=""/>
+                    <input type="hidden" name="keyAlias" id="keyAlias" value=""/>
+                    <input type="hidden" name="password" id="password" value=""/>
+                    <input type="hidden" name="keyType" id="keyType" value="AUTHENTICATION"/>
+                    <input type="hidden" name="xmlToSign" id="xmlToSign"
+                       value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;login&gt;&lt;timeTicket&gt;1663666507194&lt;/timeTicket&gt;&lt;sessionid&gt;ee47e162-98d2-495c-b5b4-17080d78a929&lt;/sessionid&gt;&lt;/login&gt;"/>
+                     <div class="justify-content-center">
+                        <div class="col-auto col-md-5">
+                            <input type="button" class="btn btn-primary btn-fit mt-3 mr-3 ml-3" id="buttonSelectCert" value="Выбрать сертификат" onclick="selectSignType('LOGIN')"/>
+                        </div>
+                    </div>
+                     <div class="justify-content-center  mt-2 d-flex small">
+                        <a href="/web/signup?">Don't have an account?</a>
+<!--                        <a href="/web/reset_password?">Reset Password</a>-->
+                    </div>
+                    <div class="o_login_auth"/>
+                </div>
+            </form>
+        </t>
+        <script src="/eds_login/static/src/js/open_nclayer.js"/>
+         <div class="modal" id="NCALayerError" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header alert-danger">
+                            <h5 class="modal-title"><span>Ошибка</span></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <span>Произошла ошибка. Повторите заново.</span>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="hideNcaLayerError()">Закрыть</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal" id="NCALayerNotConnected" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header alert-danger">
+                            <h5 class="modal-title"><span>Ошибка при подключении к NCALayer</span></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <span>Убедитесь что программа NCALayer запущена и повторите попытку.<br/><a href="https://pki.gov.kz/ncalayer/" target="_blank">Инструкция по запуску программы</a></span>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="hideNCALayerNotConnectedModal()">Закрыть</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal" id="chooseNCLayerModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><span>Выберите тип документа</span></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="selectCertNCLayerStore" class="btn-group-vertical"/>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal" >Отмена</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </template>
+
+
+    <template  id="login_inherit" inherit_id="web.login"  name="Login">
+        <xpath expr="//form" position="before">
+            <div class="container" >
+                <div class="row">
+                    <div class="col-lg-12 text-center">
+                        <h4 class="font-weight-bold text-center" > <span>Вход на портал</span></h4>
+                        <ul class="nav nav-tabs nav-pills with-arrow lined flex-column flex-sm-row">
+                            <li class="nav-item flex-sm-fill col-sm-12 col-md-4">
+                                <a type="button" class="nav-link  rounded-0" id="selectSignType" href="/web/login"><span>Login/Password</span></a>
+                            </li>
+                            <li class="nav-item flex-sm-fill col-sm-12 col-md-4">
+                                <a type="button" class="nav-link rounded-0" id="selectSignType" href="/web/login_esp"><span>EDS</span></a>
+                            </li>
+                            <li class="nav-item flex-sm-fill col-sm-12 col-md-4">
+                                <a type="button" class="nav-link rounded-0" id="selectSignType" href="/web/login_digital_id"><span>Digital ID</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+
+   <template id="login_digital_id">
+        <t t-call="web.login_layout">
+            <div class="container" >
+                <div class="row">
+                    <div class="col-lg-12 text-center">
+                        <h4 class="font-weight-bold text-center" > <span>Вход на портал</span></h4>
+                        <ul class="nav nav-tabs nav-pills with-arrow lined flex-column flex-sm-row">
+                            <li class="nav-item flex-sm-fill col-sm-12 col-md-4">
+                                <a type="button" class="nav-link  rounded-0" id="selectSignType" href="/web/login"><span>Login/Password</span></a>
+                            </li>
+                            <li class="nav-item flex-sm-fill col-sm-12 col-md-4">
+                                <a type="button" class="nav-link rounded-0" href="/web/login_esp"><span>EDS</span></a>
+                            </li>
+                            <li class="nav-item flex-sm-fill col-sm-12 col-md-4">
+                                <a type="button" class="nav-link rounded-0" href="/web/login_esp"><span>Digital ID</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+             <form id="oe_signup_form" method="post" role="form" autocomplete="off" style="width: fit-content; margin: auto;">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <img src="/eds_login/static/img/img.png" style=" margin-top:20px;" class="illustration_border" />
+                     <p class="text-center" style="color:red;">Digital ID в Разработке</p>
+            </form>
+        </t>
+    </template>
+</odoo>

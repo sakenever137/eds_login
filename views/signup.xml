@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <template id="signup_esp" name="Sign up with EDS" inherit_id="auth_signup.signup">
+        <xpath expr="//button[hasclass('btn-primary')]" position="after">
+            <em class="d-block text-center text-muted small my-2">- or -</em>
+            <a type="button" class="list-group-item list-group-item-action py-2"  t-attf-href="/web/signup_eds?{{ keep_query() }}">Sign up with EDS</a>
+        </xpath>
+     </template>
+     <template id="signup_eds" name="Sign up with EDS">
+         <script src="/eds_login/static/src/js/open_nclayer.js"/>
+        <t t-call="web.login_layout">
+            <form id="oe_signup_form" method="post" role="form" enctype="application/x-www-form-urlencoded" autocomplete="off" style="width: fit-content; margin: auto; display:block; max-width: 300px;">
+              <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                <em class="d-block text-center text-muted small my-2">Password will send to email after complete sign up</em>
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                 <div id="signPnlSignedXMLS" style="visibility: hidden;">
+                    <input type="hidden" id="certificate" name="certificate"/>
+                </div>
+                <div style="visibility: hidden;">
+                    <input id="usernameEds" type="hidden" name="username"/>
+                </div>
+                <div style="visibility: hidden;">
+                    <input id="eds_lvl" type="hidden" name="lvl" value="7"/>
+                </div>
+                <div style="visibility: hidden;">
+                    <input id="url" type="hidden" name="url" value=""/>
+                </div>
+                <div class="form-group field-login">
+                    <label for="login">Your Email</label>
+                    <input type="email" name="login" t-att-value="login" id="login" class="form-control form-control-sm" autofocus="autofocus"
+                        autocapitalize="off" required="True" t-att-readonly="'readonly' if only_passwords else None"/>
+                </div>
+                <a type="button" class="btn btn-primary btn-block" href="javascript: selectSignType('LOGIN')">Choose certificate</a>
+                <p class="alert alert-danger" t-if="error" role="alert">
+                    <t t-esc="error"/>
+                </p>
+                <input type="hidden" name="redirect" t-att-value="redirect"/>
+                <input type="hidden" name="token" t-att-value="token"/>
+                <input type="hidden" name="storagePath" id="storagePath" value=""/>
+                <input type="hidden" name="storageAlias" id="storageAlias" value=""/>
+                <input type="hidden" name="keyAlias" id="keyAlias" value=""/>
+                <input type="hidden" name="password" id="password" value=""/>
+                <input type="hidden" name="keyType" id="keyType" value="AUTHENTICATION"/>
+                <input type="hidden" name="xmlToSign" id="xmlToSign"
+                   value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;login&gt;&lt;timeTicket&gt;&lt;/timeTicket&gt;&lt;sessionid&gt;&lt;/sessionid&gt;&lt;/login&gt;"/>
+                <div class="text-center oe_login_buttons pt-3">
+                    <em class="d-block text-center text-muted small my-2">- or -</em>
+                    <a type="button" class="list-group-item list-group-item-action py-2"  t-attf-href="/web/signup?{{ keep_query() }}">Sign up login/password</a>
+                    <a t-attf-href="/web/login?{{ keep_query() }}" class="btn btn-link btn-sm" role="button">Already have an account?</a>
+                    <div class="o_login_auth"/>
+                </div>
+            </form>
+        </t>
+    </template>
+</odoo>

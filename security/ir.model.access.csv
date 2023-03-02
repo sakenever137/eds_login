@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+eds_login_manager,eds_login_manager,model_eds_login,base.group_system,1,1,1,1
+eds_login_user,eds_login_user,model_eds_login,base.group_user,1,0,0,0
